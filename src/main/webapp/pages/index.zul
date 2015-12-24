@@ -1,0 +1,90 @@
+<?page title="Employee Maintenance" ?>
+<zk>
+<window id="employeesPage" border="none" width="100%" apply="org.zkoss.bind.BindComposer"
+	viewModel="@id('vm') @init('net.learntechnology.example.viewmodel.EmployeesVM')">
+	<panel width="99%" border="normal"  height="350px">
+		<caption label="Employees (click to edit/view)" style="text-align: left;">
+			 <button label="Create New" onClick="@command('createEmployee')" style="font-size:12px;" />
+		</caption>
+		<panelchildren>
+			<vlayout style="margin:10px;">
+				<listbox id="employeesList" model="@load(vm.employees)"
+						 selectedItem="@bind(vm.employee)"
+						 width="99%" rows="8">
+ 					<listhead>
+						<listheader label="Name" align="left"   width="130px"  sort="auto(name)" />
+						<listheader label="Department" align="left"  width="160px"  sort="auto(department.name)" />
+					</listhead>
+					<template name="model" var="item">
+						<listitem onClick="@command('editEmployee')">
+							<listcell label="@load(item.name)"/>
+							<listcell label="@load(item.department.name)"/>
+						</listitem>
+					</template>
+				</listbox>
+			</vlayout>
+		</panelchildren>
+	</panel>
+	<panel height="300px" style="padding-top:10px;">
+		<caption label="@load(vm.employee.id ne null ? 'Update Employee':'Create Employee')" style="text-align: left;"/>
+		<panelchildren>
+			<vlayout style="padding:5px;"
+					 form="@id('emp')
+					@load(vm.employee)
+					@save(vm.employee, before='update'),
+					@save(vm.employee, before='add')">
+					<vlayout>
+						<grid>
+							<columns>
+								<column align="right" width="120px"/>
+								<column/>
+							</columns>
+							<rows>
+								<row visible="@load(emp.id ne null)">
+									<cell sclass="row-title">ID:</cell>
+									<cell><textbox disabled="true" value="@bind(emp.id)" style="width:40px"/></cell>
+								</row>
+								<row>
+									<cell sclass="row-title">Name:</cell>
+									<cell><textbox value="@bind(emp.name)" constraint="no empty" style="width:400px"/></cell>
+								</row>
+								<row>
+									<cell sclass="row-title">Department:</cell>
+									<!--
+									 ***************
+									 This part is the issue. The below works in zk 7.0.4
+									 but not in zk 8.0.0
+									 I can not get the selectedItem bound using the form proxy.
+									 Using vm.employee.department isn't a work-around either since
+									 that will cause the underlying employee record in the list to be updated
+								     (which we only want happening upon update)
+								     *******************
+									-->
+									<cell>
+										 <listbox model="@load(vm.departments)" selectedItem="@bind(emp.department)"
+												 width="200px" mold="select" rows="1"
+												 id="departmentsList">
+												<template name="model" var="item">
+													<listitem>
+														<listcell label="@load(item.name)"/>
+													</listitem>
+												</template>
+										</listbox>
+									</cell>
+								</row>
+							</rows>
+						</grid>
+					</vlayout>
+					<vlayout>
+						<hlayout>
+							<button label="Update" onClick="@command('update')" visible="@load(vm.employee.id ne null)"/>
+							<button label="Delete" onClick="@command('delete')" visible="@load(vm.employee.id ne null)"/>
+							<button label="Add" onClick="@command('add')" visible="@load(vm.employee.id eq null)"/>
+							<button label="Cancel" onClick="@command('cancel')"/>
+						</hlayout>
+					</vlayout>
+				</vlayout>
+		</panelchildren>
+	</panel>
+</window>
+</zk>
