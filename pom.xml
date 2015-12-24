@@ -23,7 +23,7 @@
 
 	<properties>
 		<!--7.0.4   WORKS -->
-		<!-- 8.0.0   version right click on row not working -->
+		<!-- 8.0.0  NOT WORKING AS EXPECTED see index.zul -->
 		<zk.version>8.0.0</zk.version>
 	</properties>
 
